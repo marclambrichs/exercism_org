@@ -10,14 +10,11 @@ defmodule WineCellar do
   def filter(cellar, color, opts \\ []) do
     cellar
     |> Keyword.get_values(color)
-    |> maybe_filter_by_year(Keyword.fetch(opts, :year))
-    |> maybe_filter_by_country(Keyword.fetch(opts, :country))
+    |> filter_by_year(opts[:year])
+    |> filter_by_country(opts[:country])
   end
 
-  defp maybe_filter_by_year(wines, :error), do: wines
-  defp maybe_filter_by_year(wines, {:ok, year}), do: filter_by_year(wines, year)
-
-  defp filter_by_year(wines, year)
+  defp filter_by_year(wines, nil), do: wines
   defp filter_by_year([], _year), do: []
 
   defp filter_by_year([{_, year, _} = wine | tail], year) do
@@ -28,10 +25,7 @@ defmodule WineCellar do
     filter_by_year(tail, year)
   end
 
-  defp maybe_filter_by_country(wines, :error), do: wines
-  defp maybe_filter_by_country(wines, {:ok, country}), do: filter_by_country(wines, country)
-
-  defp filter_by_country(wines, country)
+  defp filter_by_country(wines, nil), do: wines
   defp filter_by_country([], _country), do: []
 
   defp filter_by_country([{_, _, country} = wine | tail], country) do
