@@ -19,33 +19,24 @@ defmodule PaintByNumber do
   end
 
   def prepend_pixel(picture, color_count, pixel_color_index) do
-    palette_bit_size(color_count)
-    |> then(
-      &case picture do
-        <<>> -> <<pixel_color_index::size(&1)>>
-        _ -> <<pixel_color_index::size(&1), picture::bitstring>>
-      end
-    )
+    bitsize = palette_bit_size(color_count)
+    <<pixel_color_index::size(bitsize), picture::bitstring>>
   end
+
+  def get_first_pixel(<<>>, _color_count), do: nil
 
   def get_first_pixel(picture, color_count) do
-    palette_bit_size(color_count)
-    |> then(
-      &case picture do
-        <<>> -> nil
-        <<value::size(&1), _rest::bitstring>> -> value
-      end
-    )
+    bitsize = palette_bit_size(color_count)
+    <<value::size(bitsize), _::bitstring>> = picture
+    value
   end
 
+  def drop_first_pixel(<<>>, _color_count), do: <<>>
+
   def drop_first_pixel(picture, color_count) do
-    palette_bit_size(color_count)
-    |> then(
-      &case picture do
-        <<>> -> <<>>
-        <<_value::size(&1), rest::bitstring>> -> rest
-      end
-    )
+    bitsize = palette_bit_size(color_count)
+    <<_::size(bitsize), rest::bitstring>> = picture
+    rest
   end
 
   def concat_pictures(picture1, picture2) do
